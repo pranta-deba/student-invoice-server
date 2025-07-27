@@ -16,6 +16,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    role: {
+      type: String,
+      default: "user",
+    },
+    image: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
