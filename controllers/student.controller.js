@@ -6,6 +6,56 @@ const extractClassPrefix = (studentClass) => {
   );
 };
 
+export const getAllStudents = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "", studentClass, roll } = req.query;
+
+    const query = {};
+
+    // Search by studentName, fatherName, motherName, or roll
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { studentName: searchRegex },
+        { fatherName: searchRegex },
+        { motherName: searchRegex },
+        { roll: isNaN(search) ? undefined : parseInt(search) },
+      ].filter(Boolean);
+    }
+
+    // Filter by class
+    if (studentClass) {
+      query.studentClass = studentClass;
+    }
+
+    // Filter by roll
+    if (roll) {
+      query.roll = parseInt(roll);
+    }
+
+    const total = await Student.countDocuments(query);
+
+    const students = await Student.find(query)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: students,
+      pagination: {
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+        limit: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.error("Get all students error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 export const registerStudent = async (req, res) => {
   try {
     const data = req.body;
@@ -49,7 +99,6 @@ export const getSingleStudentByRollAndClass = async (req, res) => {
   }
 };
 
-// put request
 export const studentPayment = async (req, res) => {
   const { studentId, payment } = req.body;
 
