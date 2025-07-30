@@ -58,3 +58,15 @@ export const loginUser = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
+
+export const getUser = async (req, res) => {
+  const { email } = req.query;
+  try {
+    const user = await User.findOne({ email }).select("-password");
+    res.json({ success: true, user });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
