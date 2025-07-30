@@ -35,3 +35,16 @@ export const registerStudent = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const getSingleStudentByRollAndClass = async (req, res) => {
+  try {
+    const { roll, studentClass } = req.query;
+    const student = await Student.findOne({
+      roll: parseInt(roll),
+      studentClass,
+    });
+    return res.status(200).json({ success: true, student });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
