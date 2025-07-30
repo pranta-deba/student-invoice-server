@@ -48,3 +48,19 @@ export const getSingleStudentByRollAndClass = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+// put request
+export const studentPayment = async (req, res) => {
+  const { studentId, payment } = req.body;
+
+  try {
+    const student = await Student.findOneAndUpdate(
+      { _id: studentId },
+      { $inc: { advancePayment: parseInt(payment), due: -parseInt(payment) } },
+      { new: true }
+    );
+    return res.status(200).json({ success: true, student });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
